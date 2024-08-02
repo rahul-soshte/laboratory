@@ -4,52 +4,40 @@ import { Card, Link, Text, Icon } from "@stellar/design-system";
 
 import { NextLink } from "@/components/NextLink";
 import { LayoutContentContainer } from "@/components/layout/LayoutContentContainer";
-import { InfoCards } from "@/components/InfoCards";
+import  {InfoCards2} from "@/components/InfoCards2";
 import { SdsLink } from "@/components/SdsLink";
 import { Box } from "@/components/layout/Box";
-
 import { Routes } from "@/constants/routes";
 import { openUrl } from "@/helpers/openUrl";
 
 export default function Introduction() {
   const infoCards = [
     {
-      id: "stellar-quest",
-      title: "Stellar Quest",
+      id: "fee-estimation",
+      title: "Fee Estimation",
       description:
-        "Learn to build world-class applications on the Stellar network in a gamified experience",
-      buttonLabel: "Go to site",
-      buttonIcon: <Icon.LinkExternal01 />,
-      buttonAction: () => openUrl("https://quest.stellar.org/"),
+        "Estimate fees based on current network conditions to optimize transaction costs.",
+      buttonLabel: "Try It",
+      buttonIcon: <Icon.ArrowBlockRight />,
+      buttonAction: Routes.BUILD_TRANSACTION,
     },
     {
-      id: "tools",
-      title: "Developer Tools",
+      id: "fee-simulation",
+      title: "Fee Simulation",
       description:
-        "Tools, like the Stellar CLI, for reading and interacting with smart contracts on the Stellar Network",
-      buttonLabel: "See tools",
-      buttonIcon: undefined,
-      buttonAction: () =>
-        openUrl("https://developers.stellar.org/docs/tools/sdks"),
+        "Simulate transactions with different fee settings to find optimal costs.",
+      buttonLabel: "Try It",
+      buttonIcon: <Icon.ArrowBlockRight />,
+      buttonAction:Routes.VIEW_XDR, 
     },
     {
-      id: "stellar-rpc",
-      title: "Stellar RPC",
-      description: "Learn about the Stellar RPC, a RPC gateway to Stellar",
-      buttonLabel: "Go to docs",
-      buttonIcon: <Icon.LinkExternal01 />,
-      buttonAction: () =>
-        openUrl("https://developers.stellar.org/network/soroban-rpc"),
-    },
-    {
-      id: "horizon",
-      title: "Horizon",
+      id: "fee-history",
+      title: "Analytics",
       description:
-        "Learn about the Horizon for interacting with the Stellar network",
-      buttonLabel: "Go to docs",
-      buttonIcon: <Icon.LinkExternal01 />,
-      buttonAction: () =>
-        openUrl("https://developers.stellar.org/network/horizon"),
+        "Track historical fee data and trends to make informed decisions.",
+      buttonLabel: "Explore",
+      buttonIcon: <Icon.ArrowBlockRight />,
+      buttonAction: Routes.SOROBAN_CONTRACT_EXPLORER,
     },
   ];
 
@@ -58,59 +46,24 @@ export default function Introduction() {
       <Card>
         <div className="CardText">
           <Text size="lg" as="h1" weight="medium">
-            Stellar Laboratory
+            Fee Simulator
           </Text>
 
           <Text size="sm" as="p">
-            The Stellar Laboratory is a set of tools that enables people to try
-            out and learn about the Stellar network. The Laboratory can{" "}
-            <NextLink href={Routes.BUILD_TRANSACTION} sds-variant="primary">
-              build transactions
-            </NextLink>
-            ,{" "}
-            <NextLink href={Routes.SIGN_TRANSACTION} sds-variant="primary">
-              sign them
-            </NextLink>
-            , and{" "}
-            <NextLink href={Routes.SUBMIT_TRANSACTION} sds-variant="primary">
-              submit them to the network
-            </NextLink>
-            . It can also make requests to RPC and Horizon endpoints. You can
-            save your transactions and runbooks for future use.
+            The Fee Simulator Tool is designed to help users understand and optimize transaction fees on the Stellar network. This tool includes features like:
           </Text>
 
-          <Text size="sm" as="p">
-            For Stellar docs, take a look at the{" "}
-            <Link href="https://developers.stellar.org/">
-              Stellar developers site
-            </Link>
-            .
-          </Text>
+          <ul>
+            <li>Fee estimation based on current network conditions</li>
+            <li>Fee simulation to find the optimal transaction costs</li>
+            <li>Historical fee data tracking and trend analysis</li>
+          </ul>
         </div>
       </Card>
 
-      <InfoCards infoCards={infoCards} />
+      <InfoCards2 infoCards={infoCards} />
 
-      <div className="IntroFooter">
-        <Box gap="sm" direction="row">
-          <SdsLink
-            href="https://www.stellar.org/privacy-policy"
-            variant="secondary"
-          >
-            Privacy Policy
-          </SdsLink>
-          <SdsLink
-            href="https://www.stellar.org/terms-of-service"
-            variant="secondary"
-          >
-            Terms of Service
-          </SdsLink>
-        </Box>
-
-        {process.env.NEXT_PUBLIC_COMMIT_HASH ? (
-          <div>{`Commit hash: ${process.env.NEXT_PUBLIC_COMMIT_HASH}`}</div>
-        ) : null}
-      </div>
+      
     </LayoutContentContainer>
   );
 }

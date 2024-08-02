@@ -165,6 +165,16 @@ export type InfoCard = {
   buttonAction: () => void;
 };
 
+export type InfoCard2 = {
+  id: string;
+  title: string;
+  description: string;
+  buttonLabel: string;
+  buttonIcon?: React.ReactNode;
+  buttonAction: any;
+};
+
+
 // =============================================================================
 // Operations
 // =============================================================================

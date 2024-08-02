@@ -13,34 +13,17 @@ type NavLink = {
 
 const primaryNavLinks: NavLink[] = [
   {
-    href: Routes.ROOT,
-    label: "Introduction",
-  },
-  {
-    href: Routes.ACCOUNT_CREATE,
-    label: "Account",
-  },
-  {
-    href: Routes.ENDPOINTS,
-    label: "Endpoints",
-  },
-  {
     href: Routes.BUILD_TRANSACTION,
-    label: "Transactions",
+    label: "Estimation",
   },
   {
     href: Routes.VIEW_XDR,
-    label: "XDR",
+    label: "Simulation",
   },
   {
     href: Routes.SOROBAN_CONTRACT_EXPLORER,
-    label: "Soroban",
-  },
-  {
-    href: "https://developers.stellar.org/",
-    label: "View Docs",
-    icon: <Icon.LinkExternal01 />,
-  },
+    label: "Analytics",
+  }
 ];
 
 export const MainNav = () => {
