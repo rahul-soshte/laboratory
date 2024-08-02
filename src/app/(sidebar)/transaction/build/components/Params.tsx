@@ -6,16 +6,13 @@ import { MemoValue } from "@stellar/stellar-sdk";
 import { get, omit, set } from "lodash";
 
 import { Box } from "@/components/layout/Box";
-import { PubKeyPicker } from "@/components/FormElements/PubKeyPicker";
 import { PositiveIntPicker } from "@/components/FormElements/PositiveIntPicker";
 import { SdsLink } from "@/components/SdsLink";
-import { Routes } from "@/constants/routes";
 import { InputSideElement } from "@/components/InputSideElement";
 import {
   MemoPicker,
   MemoPickerValue,
 } from "@/components/FormElements/MemoPicker";
-import { TimeBoundsPicker } from "@/components/FormElements/TimeBoundsPicker";
 import { ValidationResponseCard } from "@/components/ValidationResponseCard";
 
 import { sanitizeObject } from "@/helpers/sanitizeObject";
@@ -254,38 +251,18 @@ export const Params = () => {
     <Box gap="md">
       <Card>
         <Box gap="lg">
-          <PubKeyPicker
-            id="source_account"
-            label="Source Account"
-            value={txnParams.source_account}
-            error={paramsError.source_account}
-            onChange={(e) => {
-              const id = "source_account";
-              handleParamChange(id, e.target.value);
-              handleParamsError(id, validateParam(id, e.target.value));
-            }}
-            note={
-              <>
-                If you don’t have an account yet, you can create and fund a test
-                net account with the{" "}
-                <SdsLink href={Routes.ACCOUNT_CREATE}>account creator</SdsLink>.
-              </>
-            }
-            infoLink="https://developers.stellar.org/docs/learn/glossary#source-account"
-          />
-
           <PositiveIntPicker
-            id="seq_num"
-            label="Transaction Sequence Number"
+            id="cpu_instructions"
+            label="Number of CPU instructions"
             placeholder="Ex: 559234806710273"
             value={txnParams.seq_num}
             error={paramsError.seq_num}
             onChange={(e) => {
-              const id = "seq_num";
+              const id = "cpu_instructions";
               handleParamChange(id, e.target.value);
               handleParamsError(id, validateParam(id, e.target.value));
             }}
-            note="The transaction sequence number is usually one higher than current account sequence number."
+            note="the number of CPU instructions the transaction uses, metered by the host environment"
             rightElement={
               <InputSideElement
                 variant="button"
@@ -330,35 +307,6 @@ export const Params = () => {
               </>
             }
             infoLink="https://developers.stellar.org/docs/learn/glossary#base-fee"
-          />
-
-          <MemoPicker
-            id="memo"
-            value={getMemoPickerValue()}
-            labelSuffix="optional"
-            error={paramsError.memo}
-            onChange={(_, memo) => {
-              const id = "memo";
-              handleParamChange(id, getMemoValue(memo));
-              handleParamsError(id, validateParam(id, memo));
-            }}
-            infoLink="https://developers.stellar.org/docs/encyclopedia/memos"
-          />
-
-          <TimeBoundsPicker
-            id="time"
-            value={{
-              min_time: txnParams.cond?.time?.min_time,
-              max_time: txnParams.cond?.time?.max_time,
-            }}
-            labelSuffix="optional"
-            error={paramsError.cond?.time}
-            onChange={(timeBounds) => {
-              const id = "cond.time";
-              handleParamChange(id, timeBounds);
-              handleParamsError(id, validateParam("cond", timeBounds));
-            }}
-            infoLink="https://developers.stellar.org/docs/learn/glossary#time-bounds"
           />
 
           <Box gap="md" direction="row" align="center" justify="space-between">

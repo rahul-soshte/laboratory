@@ -1,14 +1,9 @@
 "use client";
 
-import { Card, Link, Text, Icon } from "@stellar/design-system";
-
-import { NextLink } from "@/components/NextLink";
+import { Card, Text, Icon } from "@stellar/design-system";
 import { LayoutContentContainer } from "@/components/layout/LayoutContentContainer";
 import  {InfoCards2} from "@/components/InfoCards2";
-import { SdsLink } from "@/components/SdsLink";
-import { Box } from "@/components/layout/Box";
 import { Routes } from "@/constants/routes";
-import { openUrl } from "@/helpers/openUrl";
 
 export default function Introduction() {
   const infoCards = [
