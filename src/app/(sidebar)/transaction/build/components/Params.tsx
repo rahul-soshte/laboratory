@@ -24,6 +24,76 @@ import { useAccountSequenceNumber } from "@/query/useAccountSequenceNumber";
 import { validate } from "@/validate";
 import { EmptyObj, KeysOfUnion } from "@/types/types";
 
+import * as StellarSDK from '@stellar/stellar-sdk';
+const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
+
+interface FloatingFeeDisplayProps {
+  fee: number;
+}
+
+const FloatingFeeDisplay: React.FC<FloatingFeeDisplayProps> = ({ fee }) => (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    color: 'white',
+    padding: '10px',
+    borderRadius: '5px',
+    zIndex: 1000
+  }}>
+    Estimated Fee: {fee.toFixed(7)} XLM
+  </div>
+);
+
+const maxConfigAndCost = {
+  networkSettings: {
+    maxCpuInstructionsPerTxn: 100_000_000,
+    maxMemoryLimitPerTxn: 40 * 1024 * 1024, // 40 MB in bytes
+    maxLedgerKeySize: 250,
+    maxLedgerEntrySizePerTxn: 64 * 1024, // 64 KB in bytes
+    maxReadLedgerEntriesPerTxn: 40,
+    maxWriteLedgerEntriesPerTxn: 25,
+    maxReadBytesPerTxn: 200 * 1024, // 200 KB in bytes
+    maxWriteBytesPerTxn: 65 * 1024, // 65 KB in bytes
+    maxTxnSize: 70 * 1024, // 70 KB in bytes
+    maxEventsReturnValueSize: 8 * 1024, // 8 KB in bytes
+  },
+  costs: {
+    cpuInstructionPer10k: 25,
+    readLedgerEntry: 6250,
+    writeLedgerEntry: 10000,
+    read1KBFromLedger: 1786,
+    txnSizePer1KB: 1624,
+    txnHistoryPer1KB: 16235,
+    eventsReturnValuePer1KB: 10000,
+    write1KBToLedger: 11800,
+  }
+};
+
+function calculateResourceFee(actualUsage: any, config: any) {
+  const { costs } = config;
+  const cpuFee = (actualUsage.cpuInstructionsPerTxn || 0) / 10_000 * costs.cpuInstructionPer10k;
+  const readLedgerEntryFee = (actualUsage.readLedgerEntriesPerTxn || 0) * costs.readLedgerEntry;
+  const writeLedgerEntryFee = (actualUsage.writeLedgerEntriesPerTxn || 0) * costs.writeLedgerEntry;
+  const readBytesFee = (actualUsage.readBytesPerTxn || 0) / 1024 * costs.read1KBFromLedger;
+  const writeBytesFee = (actualUsage.writeBytesPerTxn || 0) / 1024 * costs.write1KBToLedger;
+  const txnSizeFee = (actualUsage.txnSize || 0) / 1024 * costs.txnSizePer1KB;
+  const txnHistoryFee = (actualUsage.txnSize || 0) / 1024 * costs.txnHistoryPer1KB;
+  const eventsReturnValueFee = (actualUsage.eventsReturnValueSize || 0) / 1024 * costs.eventsReturnValuePer1KB;
+  const totalFee = cpuFee + readLedgerEntryFee + writeLedgerEntryFee + readBytesFee + writeBytesFee + txnSizeFee + txnHistoryFee + eventsReturnValueFee;
+  return totalFee;
+}
+
+async function fetchFeeStats() {
+  try {
+    const feeStats = await server.getFeeStats();
+    return feeStats.sorobanInclusionFee.max;
+  } catch (error) {
+    console.error('Error fetching fee stats:', error);
+  }
+}
+
 export const Params = () => {
   const requiredParams = ["source_account", "seq_num", "fee"] as const;
 
@@ -59,6 +129,40 @@ export const Params = () => {
     publicKey: txnParams.source_account,
     horizonUrl: network.horizonUrl,
   });
+
+  const [actualUsage, setActualUsage] = useState({
+    cpuInstructionsPerTxn: "0",
+    readLedgerEntriesPerTxn: "0",
+    writeLedgerEntriesPerTxn: "0",
+    readBytesPerTxn: "0",
+    writeBytesPerTxn: "0",
+    txnSize: "0",
+    eventsReturnValueSize: "0",
+  });
+
+  const [calculatedFee, setCalculatedFee] = useState(0);
+
+  useEffect(() => {
+    const calculateFee = async () => {
+      const usage = {
+        cpuInstructionsPerTxn: parseInt(actualUsage.cpuInstructionsPerTxn, 10),
+        readLedgerEntriesPerTxn: parseInt(actualUsage.readLedgerEntriesPerTxn, 10),
+        writeLedgerEntriesPerTxn: parseInt(actualUsage.writeLedgerEntriesPerTxn, 10),
+        readBytesPerTxn: parseInt(actualUsage.readBytesPerTxn, 10),
+        writeBytesPerTxn: parseInt(actualUsage.writeBytesPerTxn, 10),
+        txnSize: parseInt(actualUsage.txnSize, 10),
+        eventsReturnValueSize: parseInt(actualUsage.eventsReturnValueSize, 10),
+      };
+
+      const resourceFee = calculateResourceFee(usage, maxConfigAndCost);
+      const sorobanInclusionFee = await fetchFeeStats();
+      const totalFee = resourceFee + sorobanInclusionFee;
+      const totalFeeInXLM = totalFee * 10 ** -7;
+      setCalculatedFee(totalFeeInXLM);
+    };
+
+    calculateFee();
+  }, [actualUsage]);
 
   // Preserve values and validate inputs when components mounts
   useEffect(() => {
@@ -247,68 +351,90 @@ export const Params = () => {
 
   const formErrors = getParamsError();
 
+  // const FloatingFeeDisplay = ({ fee }) => (
+  //   <div style={{
+  //     position: 'fixed',
+  //     bottom: '20px',
+  //     right: '20px',
+  //     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  //     color: 'white',
+  //     padding: '10px',
+  //     borderRadius: '5px',
+  //     zIndex: 1000
+  //   }}>
+  //     Estimated Fee: {fee.toFixed(7)} XLM
+  //   </div>
+  // );
+
   return (
     <Box gap="md">
       <Card>
         <Box gap="lg">
-          <PositiveIntPicker
-            id="cpu_instructions"
-            label="Number of CPU instructions"
-            placeholder="Ex: 559234806710273"
-            value={txnParams.seq_num}
-            error={paramsError.seq_num}
+
+        <PositiveIntPicker
+            id="cpuInstructions"
+            label="CPU Instructions"
+            value={actualUsage.cpuInstructionsPerTxn}
             onChange={(e) => {
-              const id = "cpu_instructions";
-              handleParamChange(id, e.target.value);
-              handleParamsError(id, validateParam(id, e.target.value));
-            }}
-            note="the number of CPU instructions the transaction uses, metered by the host environment"
-            rightElement={
-              <InputSideElement
-                variant="button"
-                onClick={() => {
-                  handleParamChange("seq_num", "");
-                  fetchSequenceNumber();
-                }}
-                placement="right"
-                disabled={
-                  !txnParams.source_account || paramsError.source_account
-                }
-                isLoading={isFetchingSequenceNumber || isLoadingSequenceNumber}
-              >
-                Fetch next sequence
-              </InputSideElement>
-            }
-            infoLink="https://developers.stellar.org/docs/glossary#sequence-number"
-          />
+              setActualUsage(prev => ({ ...prev, cpuInstructionsPerTxn: e.target.value }));
+            } }
+            note="Number of CPU instructions the transaction uses" error={undefined} />
 
           <PositiveIntPicker
-            id="fee"
-            label="Base Fee"
-            value={txnParams.fee}
-            error={paramsError.fee}
+            id="readLedgerEntries"
+            label="Read Ledger Entries"
+            value={actualUsage.readLedgerEntriesPerTxn}
             onChange={(e) => {
-              const id = "fee";
-              handleParamChange(id, e.target.value);
-              handleParamsError(id, validateParam(id, e.target.value));
-            }}
-            note={
-              <>
-                The base inclusion fee is currently set to 100 stroops (0.00001
-                lumens). For more real time inclusion fee, please see{" "}
-                <SdsLink href="https://developers.stellar.org/docs/data/rpc/api-reference/methods/getFeeStats">
-                  getFeeStats
-                </SdsLink>{" "}
-                from the RPC. To learn more about fees, please see{" "}
-                <SdsLink href="https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering">
-                  Fees & Metering
-                </SdsLink>
-                .
-              </>
-            }
-            infoLink="https://developers.stellar.org/docs/learn/glossary#base-fee"
-          />
+              setActualUsage(prev => ({ ...prev, readLedgerEntriesPerTxn: e.target.value }));
+            } }
+            note="Number of ledger entries read by the transaction" error={undefined} />
 
+          <PositiveIntPicker
+            id="writeLedgerEntries"
+            label="Write Ledger Entries"
+            value={actualUsage.writeLedgerEntriesPerTxn}
+            onChange={(e) => {
+              setActualUsage(prev => ({ ...prev, writeLedgerEntriesPerTxn: e.target.value }));
+            } }
+            note="Number of ledger entries written by the transaction" error={undefined} />
+
+          <PositiveIntPicker
+            id="readBytes"
+            label="Read Bytes"
+            value={actualUsage.readBytesPerTxn}
+            onChange={(e) => {
+              setActualUsage(prev => ({ ...prev, readBytesPerTxn: e.target.value }));
+            } }
+            note="Number of bytes read by the transaction" error={undefined} />
+
+          <PositiveIntPicker
+            id="writeBytes"
+            label="Write Bytes"
+            value={actualUsage.writeBytesPerTxn}
+            onChange={(e) => {
+              setActualUsage(prev => ({ ...prev, writeBytesPerTxn: e.target.value }));
+            } }
+            note="Number of bytes written by the transaction" error={undefined} />
+
+          <PositiveIntPicker
+            id="txnSize"
+            label="Transaction Size"
+            value={actualUsage.txnSize}
+            onChange={(e) => {
+              setActualUsage(prev => ({ ...prev, txnSize: e.target.value }));
+            } }
+            note="Size of the transaction in bytes" error={undefined} />
+
+          <PositiveIntPicker
+            id="eventsReturnValueSize"
+            label="Events Return Value Size"
+            value={actualUsage.eventsReturnValueSize}
+            onChange={(e) => {
+              setActualUsage(prev => ({ ...prev, eventsReturnValueSize: e.target.value }));
+            } }
+            note="Size of the events return value in bytes" error={undefined} />
+
+          
           <Box gap="md" direction="row" align="center" justify="space-between">
             <Button
               size="md"
@@ -357,6 +483,8 @@ export const Params = () => {
           />
         ) : null}
       </>
+
+    <FloatingFeeDisplay fee={calculatedFee} />
     </Box>
   );
 };
