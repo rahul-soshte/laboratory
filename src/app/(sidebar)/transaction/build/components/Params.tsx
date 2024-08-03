@@ -23,7 +23,7 @@ import { EmptyObj, KeysOfUnion } from "@/types/types";
 
 import * as StellarSDK from '@stellar/stellar-sdk';
 import { NextLink } from "@/components/NextLink";
-const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
+// const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
 
 interface FloatingFeeDisplayProps {
   fee: number;
@@ -93,7 +93,7 @@ function calculateResourceFee(actualUsage: any, config: any) {
   return totalFee;
 }
 
-async function fetchFeeStats() {
+async function fetchFeeStats(server) {
   try {
     const feeStats = await server.getFeeStats();
     return feeStats.sorobanInclusionFee.max;
@@ -106,6 +106,11 @@ export const Params = () => {
   const requiredParams = ["source_account", "seq_num", "fee"] as const;
 
   const { transaction, network } = useStore();
+  var server = new StellarSDK.SorobanRpc.Server(network.rpcUrl, {
+    allowHttp: true,
+  });
+  console.log("Current Network RPC URL", network.rpcUrl);
+
   const { params: txnParams } = transaction.build;
   const {
     updateBuildActiveTab,
@@ -163,7 +168,7 @@ export const Params = () => {
       };
 
       const resourceFee = calculateResourceFee(usage, maxConfigAndCost);
-      const sorobanInclusionFee = await fetchFeeStats();
+      const sorobanInclusionFee = await fetchFeeStats(server);
       const totalFee = resourceFee + sorobanInclusionFee;
       const totalFeeInXLM = totalFee * 10 ** -7;
       setCalculatedFee(totalFeeInXLM);
