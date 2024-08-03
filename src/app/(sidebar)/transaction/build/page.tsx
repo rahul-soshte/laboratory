@@ -1,6 +1,6 @@
 "use client";
 
-import { TabView } from "@/components/TabView";
+import { TabView } from "@/components/TabView2";
 import { Box } from "@/components/layout/Box";
 import { useStore } from "@/store/useStore";
 
@@ -11,29 +11,29 @@ import { TransactionXdr } from "./components/TransactionXdr";
 export default function BuildTransaction() {
   const { transaction } = useStore();
   const { activeTab } = transaction.build;
-  const { updateBuildActiveTab } = transaction;
+  // const { updateBuildActiveTab } = transaction;
 
   return (
     <Box gap="md">
       <TabView
-        heading={{ title: "Build Transaction" }}
-        tab1={{
+        heading={{ title: "Estimate fees based on resource paramters of a transaction and the latest inclusion fees" }}
+        tab={{
           id: "params",
-          label: "Params",
+          label: "",
           content: activeTab === "params" ? <Params /> : null,
         }}
-        tab2={{
-          id: "operations",
-          label: "Operations",
-          content: activeTab === "operations" ? <Operations /> : null,
-        }}
-        activeTabId={activeTab}
-        onTabChange={(id) => {
-          updateBuildActiveTab(id);
-        }}
+        // tab2={{
+        //   id: "operations",
+        //   label: "Operations",
+        //   content: activeTab === "operations" ? <Operations /> : null,
+        // }}
+        // activeTabId={activeTab}
+        // onTabChange={(id) => {
+        //   updateBuildActiveTab(id);
+        // }}
       />
 
-      <>{activeTab === "operations" ? <TransactionXdr /> : null}</>
+      {/* <>{activeTab === "operations" ? <TransactionXdr /> : null}</> */}
     </Box>
   );
 }

@@ -16,11 +16,11 @@ export default function TransactionTemplate({
       sidebar={[
         {
           navItems: [
-            {
-              route: Routes.SAVED_TRANSACTIONS,
-              label: "Saved Transactions",
-              icon: <Icon.Save03 />,
-            },
+            // {
+            //   route: Routes.SAVED_TRANSACTIONS,
+            //   label: "Saved Transactions",
+            //   icon: <Icon.Save03 />,
+            // },
           ],
           hasBottomDivider: true,
         },
@@ -28,24 +28,24 @@ export default function TransactionTemplate({
           navItems: [
             {
               route: Routes.BUILD_TRANSACTION,
-              label: "Build Transaction",
+              label: "Fee Estimation",
             },
-            {
-              route: Routes.SIGN_TRANSACTION,
-              label: "Sign Transaction",
-            },
-            {
-              route: Routes.SIMULATE_TRANSACTION,
-              label: "Simulate Transaction",
-            },
-            {
-              route: Routes.SUBMIT_TRANSACTION,
-              label: "Submit Transaction",
-            },
-            {
-              route: Routes.FEE_BUMP_TRANSACTION,
-              label: "Fee Bump",
-            },
+            // {
+            //   route: Routes.SIGN_TRANSACTION,
+            //   label: "Sign Transaction",
+            // },
+            // {
+            //   route: Routes.SIMULATE_TRANSACTION,
+            //   label: "Simulate Transaction",
+            // },
+            // {
+            //   route: Routes.SUBMIT_TRANSACTION,
+            //   label: "Submit Transaction",
+            // },
+            // {
+            //   route: Routes.FEE_BUMP_TRANSACTION,
+            //   label: "Fee Bump",
+            // },
           ],
         },
       ]}

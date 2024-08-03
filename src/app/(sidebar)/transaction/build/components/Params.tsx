@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Alert, Button, Card, Icon } from "@stellar/design-system";
+import { Alert, Card} from "@stellar/design-system";
 import { MemoValue } from "@stellar/stellar-sdk";
 import { get, omit, set } from "lodash";
 
 import { Box } from "@/components/layout/Box";
 import { PositiveIntPicker } from "@/components/FormElements/PositiveIntPicker";
-import { SdsLink } from "@/components/SdsLink";
-import { InputSideElement } from "@/components/InputSideElement";
 import {
-  MemoPicker,
   MemoPickerValue,
 } from "@/components/FormElements/MemoPicker";
 import { ValidationResponseCard } from "@/components/ValidationResponseCard";
@@ -25,6 +22,7 @@ import { validate } from "@/validate";
 import { EmptyObj, KeysOfUnion } from "@/types/types";
 
 import * as StellarSDK from '@stellar/stellar-sdk';
+import { NextLink } from "@/components/NextLink";
 const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
 
 interface FloatingFeeDisplayProps {
@@ -34,15 +32,25 @@ interface FloatingFeeDisplayProps {
 const FloatingFeeDisplay: React.FC<FloatingFeeDisplayProps> = ({ fee }) => (
   <div style={{
     position: 'fixed',
-    bottom: '20px',
-    right: '20px',
+    top: '50%',
+    right: '0',
+    transform: 'translateY(-50%)',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     color: 'white',
-    padding: '10px',
-    borderRadius: '5px',
-    zIndex: 1000
+    padding: '15px',
+    borderRadius: '5px 0 0 5px', // Rounded corners only on the left side
+    zIndex: 1000,
+    width: '150px', // Fixed width
+    height: '150px', // Equal height to make it square
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    boxShadow: '0 0 10px rgba(0,0,0,0.3)' // Optional: adds a subtle shadow
   }}>
-    Estimated Fee: {fee.toFixed(7)} XLM
+    <div style={{ marginBottom: '10px', fontSize: '14px' }}>Estimated Fee</div>
+    <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{fee.toFixed(7)} XLM</div>
   </div>
 );
 
@@ -435,7 +443,7 @@ export const Params = () => {
             note="Size of the events return value in bytes" error={undefined} />
 
           
-          <Box gap="md" direction="row" align="center" justify="space-between">
+          {/* <Box gap="md" direction="row" align="center" justify="space-between">
             <Button
               size="md"
               variant="secondary"
@@ -457,18 +465,19 @@ export const Params = () => {
             >
               Clear Params
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Card>
 
       <Alert variant="primary" placement="inline">
-        The transaction builder lets you build a new Stellar transaction. This
-        transaction will start out with no signatures. To make it into the
-        ledger, this transaction will then need to be signed and submitted to
-        the network.
+        The basic formula for calculating the fees of a transaction,
+        Transaction Fee (Tx.fee) = Resource Fee (sorobanData.resourceFee) + Inclusion Fee.
+        The Inclusion Fees are pulled from the getFeeStats() method from the Javascript SDk, selecting the 'max' value of the fee, since it has the best chance of inclusion in the ledger,
+        and you can know more about the resource fees and limits <NextLink href={"https://developers.stellar.org/docs/networks/resource-limits-fees#resource-limits"} sds-variant="primary">
+        here</NextLink>
       </Alert>
 
-      <>
+      {/* <>
         {formErrors.length > 0 ? (
           <ValidationResponseCard
             variant="primary"
@@ -482,7 +491,7 @@ export const Params = () => {
             }
           />
         ) : null}
-      </>
+      </> */}
 
     <FloatingFeeDisplay fee={calculatedFee} />
     </Box>
