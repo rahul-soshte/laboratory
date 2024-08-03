@@ -471,8 +471,8 @@ export const Params = () => {
 
       <Alert variant="primary" placement="inline">
         The basic formula for calculating the fees of a transaction,
-        Transaction Fee (Tx.fee) = Resource Fee (sorobanData.resourceFee) + Inclusion Fee.
-        The Inclusion Fees are pulled from the getFeeStats() method from the Javascript SDk, selecting the 'max' value of the fee, since it has the best chance of inclusion in the ledger,
+        <b> transaction fee = resource fees + inclusion fees </b>
+        The inclusion fees are pulled from the getFeeStats() method from the Javascript SDk, selecting the 'max' inclusion value of the fee, since it has the best chance of inclusion in the ledger,
         and you can know more about the resource fees and limits <NextLink href={"https://developers.stellar.org/docs/networks/resource-limits-fees#resource-limits"} sds-variant="primary">
         here</NextLink>
       </Alert>

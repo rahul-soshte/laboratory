@@ -16,7 +16,7 @@ export default function BuildTransaction() {
   return (
     <Box gap="md">
       <TabView
-        heading={{ title: "Estimate fees based on resource paramters of a transaction and the latest inclusion fees" }}
+        heading={{ title: "Estimate fees based on resource paramters of a transaction and the selected network's currrent inclusion fees" }}
         tab={{
           id: "params",
           label: "",
