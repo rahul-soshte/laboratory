@@ -16,12 +16,12 @@ export default function XdrTemplate({
         navItems: [
           {
             route: Routes.VIEW_XDR,
-            label: "XDR to JSON",
+            label: "Fee Simulation using XDR",
           },
-          {
-            route: Routes.TO_XDR,
-            label: "JSON to XDR",
-          },
+          // {
+          //   route: Routes.TO_XDR,
+          //   label: "JSON to XDR",
+          // },
         ],
       }}
     >

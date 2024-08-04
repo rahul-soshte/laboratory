@@ -11,7 +11,7 @@ export default function Introduction() {
       id: "fee-estimation",
       title: "Fee Estimation",
       description:
-        "Estimate fees based on current network conditions to optimize transaction costs.",
+        "Estimate fees, by playing around with all the resource parameters that directly affect a transaction's overall fee",
       buttonLabel: "Try It",
       buttonIcon: <Icon.ArrowBlockRight />,
       buttonAction: Routes.BUILD_TRANSACTION,
@@ -20,7 +20,7 @@ export default function Introduction() {
       id: "fee-simulation",
       title: "Fee Simulation",
       description:
-        "Simulate transactions with different fee settings to find optimal costs.",
+        "Simulate transactions to check how much resources they consume, which can help you optimize your contract code for fees",
       buttonLabel: "Try It",
       buttonIcon: <Icon.ArrowBlockRight />,
       buttonAction:Routes.VIEW_XDR, 
@@ -50,7 +50,7 @@ export default function Introduction() {
 
           <ul>
             <li>Fee estimation based on current network conditions</li>
-            <li>Fee simulation to find the optimal transaction costs</li>
+            <li>Fee simulation to find the optimal transaction costs and fees</li>
             <li>Historical fee data tracking and trend analysis</li>
           </ul>
         </div>

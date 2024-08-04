@@ -82,7 +82,7 @@ export default function ViewXdr() {
     <Box gap="md">
       <div className="PageHeader">
         <Text size="md" as="h1" weight="medium">
-          View XDR
+          Simulate transactions to check the resource estimates and the overall fees
         </Text>
       </div>
 
@@ -95,8 +95,8 @@ export default function ViewXdr() {
             hasCopyButton
             note={
               <>
-                Input a base-64 encoded XDR blob,{" "}
-                <Link
+                Input a base-64 encoded unsigned / signed XDR blob of a transaction
+                {/* <Link
                   onClick={() => {
                     fetchLatestTxn();
                   }}
@@ -104,7 +104,7 @@ export default function ViewXdr() {
                   icon={isFetchingLatestTxn ? <Loader /> : null}
                 >
                   or fetch the latest transaction to try it out.
-                </Link>
+                </Link> */}
               </>
             }
             onChange={(e) => {
@@ -168,13 +168,9 @@ export default function ViewXdr() {
       </Card>
 
       <Alert variant="primary" placement="inline">
-        You can use use this tool to decode XDR into JSON.{" "}
-        <SdsLink href="https://developers.stellar.org/docs/encyclopedia/xdr">
-          External Data Representation
-        </SdsLink>{" "}
-        (XDR) is a standardized protocol that the Stellar network uses to encode
-        data. The XDR Viewer is a tool that displays contents of a Stellar XDR
-        blob in a human-readable format.
+        Note that while simulation provides a good estimate,
+        actual execution may vary slightly due to network conditions or changes in the ledger state between simulation and execution.
+
       </Alert>
     </Box>
   );
