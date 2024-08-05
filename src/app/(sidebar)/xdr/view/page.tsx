@@ -174,7 +174,7 @@ export default function ViewXdr() {
     };
 
     try {
-      let res = await fetch("https://soroban-testnet.stellar.org:443", {
+      let res = await fetch(network.rpcUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
