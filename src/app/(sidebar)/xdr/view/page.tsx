@@ -114,8 +114,9 @@ export default function ViewXdr() {
   const { xdr, network } = useStore();
   const { updateXdrBlob, updateXdrType, resetXdr } = xdr;
   const [contractCosts, setContractCosts] = useState<ContractCosts | null>(null);
-  const [totalEstimatedFee, setTotalEstimatedFee] = useState(null);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [totalEstimatedFee, setTotalEstimatedFee] = useState<string | null>(null);
+
 
   const isXdrInit = useIsXdrInit();
 
@@ -191,10 +192,12 @@ export default function ViewXdr() {
       setContractCosts(sorocosts);
       
       // Uncomment and adjust these lines if you want to calculate total fee
-      // let inclusionFee = await server.getFeeStats();
-      // inclusionFee = inclusionFee.sorobanInclusionFee.max;
-      // let totalFee = sorocosts.resource_fee_in_xlm + inclusionFee;
-      // setTotalEstimatedFee(totalFee);
+      const server = new StellarSDK.SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
+
+      let inclusionFee = await server.getFeeStats();
+      let inclusionFeeMax = inclusionFee.sorobanInclusionFee.max;
+      let totalFee = (sorocosts.resource_fee_in_xlm + inclusionFeeMax).toString();
+      setTotalEstimatedFee(totalFee);
     } catch (error) {
       console.error("Error simulating transaction:", error);
     } finally {
@@ -218,14 +221,14 @@ export default function ViewXdr() {
   };
 
   const combinedJson = useCallback(() => {
-    if (!xdrJsonDecoded?.jsonString) return null;
-    const decoded = JSON.parse(xdrJsonDecoded.jsonString);
+    // if (!xdrJsonDecoded?.jsonString) return null;
+    // const decoded = JSON.parse(xdrJsonDecoded.jsonString);
     return {
-      ...decoded,
+      // ...decoded,
       contractCosts: contractCosts || {},
       totalEstimatedFee: totalEstimatedFee !== null ? totalEstimatedFee : undefined
     };
-  }, [xdrJsonDecoded, contractCosts, totalEstimatedFee]);
+  }, [ contractCosts, totalEstimatedFee]);
   
   return (
     <Box gap="md">
@@ -252,13 +255,13 @@ export default function ViewXdr() {
 
           <XdrTypeSelect error={xdrJsonDecoded?.error} />
 
-          {!xdr.blob || !xdr.type ? (
+          {/* {!xdr.blob || !xdr.type ? (
             <Text as="div" size="sm">
               {!xdr.blob
                 ? "Enter a base-64 encoded XDR blob to decode."
                 : "Please select a XDR type"}
             </Text>
-          ) : null}
+          ) : null} */}
 
           <Box gap="lg" direction="row" align="center" justify="end">
             <Button
@@ -302,7 +305,7 @@ export default function ViewXdr() {
       </Card>
 
       <Alert variant="primary" placement="inline">
-        The fee simulation shows the estimated resource usage—including CPU instructions, memory usage, ledger entry accesses, ledger I/O operations, transaction size, events, and return value size—while the fee calculation determines the overall expected fee.
+        The fee simulation shows the estimated resource usage, including CPU instructions, memory usage, ledger entry accesses, ledger I/O operations, transaction size, events, and return value size, which directly affect the transaction fees, while the overall fee, considering the resource fees and current inclusion fees.
         Note that while simulation provides a good estimate,
         actual execution may vary slightly due to network conditions or changes in the ledger state between simulation and execution.
       </Alert>
